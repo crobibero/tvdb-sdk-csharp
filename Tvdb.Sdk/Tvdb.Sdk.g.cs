@@ -8614,6 +8614,21 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("inspirations")]
+        public System.Collections.Generic.IReadOnlyList<Inspiration> Inspirations { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("productionCountries")]
+        public System.Collections.Generic.IReadOnlyList<ProductionCountry> ProductionCountries { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("spokenLanguages")]
+        public System.Collections.Generic.IReadOnlyList<string> SpokenLanguages { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("firstRelease")]
+        public Release FirstRelease { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("companies")]
+        public Companies Companies { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9481,6 +9496,90 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("tagId")]
         public int TagId { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>Movie inspiration record</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class Inspiration 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public long Id { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("type")]
+        public string Type { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
+        public string TypeName { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string Url { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>Production country record</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class ProductionCountry 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public long Id { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("country")]
+        public string Country { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>Companies by type record</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class Companies 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("studio")]
+        public Company Studio { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("network")]
+        public Company Network { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("production")]
+        public Company Production { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("distributor")]
+        public Company Distributor { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("specialEffects")]
+        public Company SpecialEffects { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
