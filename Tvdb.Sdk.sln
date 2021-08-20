@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tvdb.Sdk", "Tvdb.Sdk\Tvdb.Sdk.csproj", "{7218C6F1-6CDF-4A28-A553-4F82479E5849}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{0689BC1E-BC20-42A6-BB67-833B5B67077D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tvdb.Sdk.Sample", "samples\Tvdb.Sdk.Sample\Tvdb.Sdk.Sample.csproj", "{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{7218C6F1-6CDF-4A28-A553-4F82479E5849}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7218C6F1-6CDF-4A28-A553-4F82479E5849}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7218C6F1-6CDF-4A28-A553-4F82479E5849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5D5EE4F5-7BE4-4286-AE6F-4CA2C157EF58} = {0689BC1E-BC20-42A6-BB67-833B5B67077D}
 	EndGlobalSection
 EndGlobal
