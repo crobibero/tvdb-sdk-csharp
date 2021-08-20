@@ -8611,6 +8611,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("subtitleLanguages")]
         public System.Collections.Generic.IReadOnlyList<string> SubtitleLanguages { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("tagOptions")]
+        public System.Collections.Generic.IReadOnlyList<TagOption> TagOptions { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
     
@@ -9028,6 +9031,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public long Type { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("companies")]
+        public Companies Companies { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("tagOptions")]
+        public System.Collections.Generic.IReadOnlyList<TagOption> TagOptions { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
