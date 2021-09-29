@@ -10024,7 +10024,7 @@ namespace Tvdb.Sdk
     
     }
     
-    /// <summary>The base record for a series</summary>
+    /// <summary>The base record for a series. All series airs time like firstAired, lastAired, nextAired, etc. are in US EST for US series, and for all non-US series, the time of the show’s country capital or most populous city. For streaming services, is the official release time. See https://support.thetvdb.com/kb/faq.php?id=29.</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class SeriesBaseRecord 
     {
@@ -10094,7 +10094,7 @@ namespace Tvdb.Sdk
     
     }
     
-    /// <summary>The extended record for a series</summary>
+    /// <summary>The extended record for a series. All series airs time like firstAired, lastAired, nextAired, etc. are in US EST for US series, and for all non-US series, the time of the show’s country capital or most populous city. For streaming services, is the official release time. See https://support.thetvdb.com/kb/faq.php?id=29.</summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class SeriesExtendedRecord 
     {
