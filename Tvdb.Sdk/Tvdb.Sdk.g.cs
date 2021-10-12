@@ -7057,7 +7057,7 @@ namespace Tvdb.Sdk
         /// <param name="season_type">season-type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -7372,7 +7372,7 @@ namespace Tvdb.Sdk
         /// <param name="season_type">season-type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7391,6 +7391,10 @@ namespace Tvdb.Sdk
             if (season != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("season") + "=").Append(System.Uri.EscapeDataString(ConvertToString(season, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (episodeNumber != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("episodeNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(episodeNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
     
@@ -7437,7 +7441,7 @@ namespace Tvdb.Sdk
                         if (status_ == 400)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Invalid series id", status_, responseText_, headers_, null);
+                            throw new SeriesException("Invalid series id, episodeNumber is not null then season must be present", status_, responseText_, headers_, null);
                         }
                         else
                         if (status_ == 401)
@@ -8918,11 +8922,11 @@ namespace Tvdb.Sdk
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class CompanyType 
     {
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int Id { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("companyTypeId")]
+        public int CompanyTypeId { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("companyTypeName")]
+        public string CompanyTypeName { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -9060,6 +9064,10 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("timeStamp")]
         public long TimeStamp { get; set; }
+    
+        /// <summary>Only present for episodes records</summary>
+        [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
+        public long SeriesId { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
