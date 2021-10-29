@@ -7055,9 +7055,10 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="season_type">season-type</param>
+        /// <param name="airDate">airDate of the episode, format is yyyy-mm-dd</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
     
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -7370,9 +7371,10 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="season_type">season-type</param>
+        /// <param name="airDate">airDate of the episode, format is yyyy-mm-dd</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public async System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public async System.Threading.Tasks.Task<Response48> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7395,6 +7397,10 @@ namespace Tvdb.Sdk
             if (episodeNumber != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("episodeNumber") + "=").Append(System.Uri.EscapeDataString(ConvertToString(episodeNumber, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (airDate != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("airDate") + "=").Append(System.Uri.EscapeDataString(ConvertToString(airDate, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
     
@@ -10090,6 +10096,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("episodes")]
+        public System.Collections.Generic.IReadOnlyList<EpisodeBaseRecord> Episodes { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -10168,6 +10177,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("originalLanguage")]
         public string OriginalLanguage { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("originalNetwork")]
+        public Company OriginalNetwork { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("latestNetwork")]
+        public Company LatestNetwork { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("overviewTranslations")]
         public System.Collections.Generic.IReadOnlyList<string> OverviewTranslations { get; set; }
@@ -10588,6 +10603,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("next")]
         public string Next { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("total_items")]
+        public int Total_items { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("page_size")]
+        public int Page_size { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -11016,6 +11037,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("links")]
+        public Links Links { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -11310,6 +11334,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("links")]
+        public Links Links { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -11368,7 +11395,7 @@ namespace Tvdb.Sdk
     public partial class Response29 
     {
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Translation Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<Translation> Data { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
