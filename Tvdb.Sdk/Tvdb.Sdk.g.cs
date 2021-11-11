@@ -9964,6 +9964,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("tagOptions")]
         public System.Collections.Generic.IReadOnlyList<TagOption> TagOptions { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("translations")]
+        public System.Collections.Generic.IReadOnlyList<Translation> Translations { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
