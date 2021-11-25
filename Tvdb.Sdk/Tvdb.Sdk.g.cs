@@ -8533,6 +8533,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("seriesPeopleId")]
         public int SeriesPeopleId { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("tagOptions")]
+        public System.Collections.Generic.IReadOnlyList<TagOption> TagOptions { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("thumbnail")]
         public string Thumbnail { get; set; }
     
@@ -8912,6 +8915,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("slug")]
         public string Slug { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("companies")]
+        public Companies Companies { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9130,6 +9136,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
         public long SeriesId { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("seasonName")]
+        public string SeasonName { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9217,6 +9226,9 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("companies")]
+        public System.Collections.Generic.IReadOnlyList<Company> Companies { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -10204,6 +10216,9 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("tags")]
+        public System.Collections.Generic.IReadOnlyList<TagOption> Tags { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
