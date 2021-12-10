@@ -8918,6 +8918,56 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("companies")]
         public Companies Companies { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("parentCompany")]
+        public ParentCompany ParentCompany { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>A parent company record</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class ParentCompany 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("relation")]
+        public CompanyRelationShip Relation { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>A company relationship</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class CompanyRelationShip 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int Id { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("typeName")]
+        public string TypeName { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9995,6 +10045,9 @@ namespace Tvdb.Sdk
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class SeasonType 
     {
+        [System.Text.Json.Serialization.JsonPropertyName("alternateName")]
+        public string AlternateName { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
     
