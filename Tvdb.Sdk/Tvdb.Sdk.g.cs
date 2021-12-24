@@ -8854,6 +8854,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("peopleId")]
         public int PeopleId { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("personImgURL")]
+        public string PersonImgURL { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
         public int SeriesId { get; set; }
     
@@ -9012,6 +9015,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("country")]
         public string Country { get; set; }
     
@@ -9096,8 +9102,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
-        public int SeriesId { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("hasSpecials")]
+        public bool HasSpecials { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -9189,6 +9195,13 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("seasonName")]
         public string SeasonName { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+    
+        /// <summary>season, midseason, or series</summary>
+        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
+        public string FinaleType { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9279,6 +9292,13 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("companies")]
         public System.Collections.Generic.IReadOnlyList<Company> Companies { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+    
+        /// <summary>season, midseason, or series</summary>
+        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
+        public string FinaleType { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -9395,6 +9415,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("score")]
+        public int Score { get; set; }
+    
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -9419,6 +9442,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("image")]
+        public string Image { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("imageIsFallback")]
+        public bool ImageIsFallback { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("isOfficial")]
         public bool IsOfficial { get; set; }
@@ -9483,6 +9512,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("runtime")]
+        public int Runtime { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -9651,6 +9686,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("nameTranslations")]
+        public System.Collections.Generic.IReadOnlyList<string> NameTranslations { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("overviewTranslations")]
+        public System.Collections.Generic.IReadOnlyList<string> OverviewTranslations { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("score")]
         public long Score { get; set; }
@@ -9835,23 +9876,26 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("director")]
         public string Director { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("extendedTitle")]
-        public string ExtendedTitle { get; set; }
-    
         [System.Text.Json.Serialization.JsonPropertyName("genres")]
         public System.Collections.Generic.IReadOnlyList<string> Genres { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("objectID")]
+        public string ObjectID { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("slug")]
+        public string Slug { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public string Id { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("imageUrl")]
-        public string ImageUrl { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("image_url")]
+        public string Image_url { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("nameTranslated")]
-        public string NameTranslated { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("name_translated")]
+        public string Name_translated { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("officialList")]
         public string OfficialList { get; set; }
@@ -9865,11 +9909,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("posters")]
         public System.Collections.Generic.IReadOnlyList<string> Posters { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("primaryLanguage")]
-        public string PrimaryLanguage { get; set; }
-    
-        [System.Text.Json.Serialization.JsonPropertyName("primaryType")]
-        public string PrimaryType { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("primary_language")]
+        public string Primary_language { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -9898,8 +9939,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("is_official")]
         public bool Is_official { get; set; }
     
-        [System.Text.Json.Serialization.JsonPropertyName("remoteIds")]
-        public System.Collections.Generic.IReadOnlyList<RemoteID> RemoteIds { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("remote_ids")]
+        public System.Collections.Generic.IReadOnlyList<RemoteID> Remote_ids { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("network")]
         public string Network { get; set; }
@@ -9926,12 +9967,6 @@ namespace Tvdb.Sdk
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
     public partial class SeasonBaseRecord 
     {
-        [System.Text.Json.Serialization.JsonPropertyName("abbreviation")]
-        public string Abbreviation { get; set; }
-    
-        [System.Text.Json.Serialization.JsonPropertyName("country")]
-        public string Country { get; set; }
-    
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
     
@@ -9953,11 +9988,11 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("overviewTranslations")]
         public System.Collections.Generic.IReadOnlyList<string> OverviewTranslations { get; set; }
     
+        [System.Text.Json.Serialization.JsonPropertyName("companies")]
+        public Companies Companies { get; set; }
+    
         [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
         public long SeriesId { get; set; }
-    
-        [System.Text.Json.Serialization.JsonPropertyName("slug")]
-        public string Slug { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public SeasonType Type { get; set; }
@@ -10055,7 +10090,7 @@ namespace Tvdb.Sdk
         public string Name { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public long Type { get; set; }
+        public string Type { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -10163,6 +10198,12 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("averageRuntime")]
+        public int AverageRuntime { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("episodes")]
         public System.Collections.Generic.IReadOnlyList<EpisodeBaseRecord> Episodes { get; set; }
@@ -10275,6 +10316,9 @@ namespace Tvdb.Sdk
     
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("translations")]
+        public System.Collections.Generic.IReadOnlyList<TranslationExtended> Translations { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -10509,6 +10553,31 @@ namespace Tvdb.Sdk
     {
         [System.Text.Json.Serialization.JsonPropertyName("language")]
         public string Language { get; set; }
+    
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+    
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+    
+    
+    }
+    
+    /// <summary>translation extended record</summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "10.5.2.0 (Newtonsoft.Json v12.0.0.0)")]
+    public partial class TranslationExtended 
+    {
+        [System.Text.Json.Serialization.JsonPropertyName("nameTranslations")]
+        public System.Collections.Generic.IReadOnlyList<Translation> NameTranslations { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("overviewTranslations")]
+        public System.Collections.Generic.IReadOnlyList<Translation> OverviewTranslations { get; set; }
+    
+        [System.Text.Json.Serialization.JsonPropertyName("alias")]
+        public System.Collections.Generic.IReadOnlyList<string> Alias { get; set; }
     
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
     
@@ -12018,7 +12087,7 @@ namespace Tvdb.Sdk
     public partial class Data2 
     {
         [System.Text.Json.Serialization.JsonPropertyName("series")]
-        public SeriesExtendedRecord Series { get; set; }
+        public SeriesBaseRecord Series { get; set; }
     
         [System.Text.Json.Serialization.JsonPropertyName("episodes")]
         public System.Collections.Generic.IReadOnlyList<EpisodeBaseRecord> Episodes { get; set; }
