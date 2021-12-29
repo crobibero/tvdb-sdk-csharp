@@ -21,6 +21,7 @@ jobs:
       - uses: actions/setup-dotnet@v1.9.0
         with:
           dotnet-version: |
+            6.0.x
             5.0.x
             3.1.x
       - uses: chrisdickinson/setup-yq@latest
@@ -38,7 +39,7 @@ jobs:
 
       - name: Create new version string
         id: version
-        run: echo "::set-output name=number::$(echo ${{ steps.apiversion.outputs.number }}-beta.$(date +'%Y%m%d%H%M'))"
+        run: echo "::set-output name=number::$(echo ${{ steps.apiversion.outputs.number }}"
 
       - name: Install dotnet-setversion
         run: dotnet tool install -g dotnet-setversion
