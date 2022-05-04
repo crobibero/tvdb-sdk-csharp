@@ -13048,7 +13048,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public MovieBaseRecord Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<MovieBaseRecord> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13474,10 +13474,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public SeriesBaseRecord Data { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        public string Status { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SeriesBaseRecord> Data { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
