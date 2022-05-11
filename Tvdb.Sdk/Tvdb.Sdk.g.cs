@@ -7424,7 +7424,7 @@ namespace Tvdb.Sdk
         /// <param name="lang">original language</param>
         /// <param name="company">production company</param>
         /// <param name="contentRating">content rating id base on a country</param>
-        /// <param name="genre">genre</param>
+        /// <param name="genre">Genre id. This id can be found using **/genres** endpoint.</param>
         /// <param name="sort">sort by results</param>
         /// <param name="status">status</param>
         /// <param name="year">release year</param>
@@ -8055,7 +8055,7 @@ namespace Tvdb.Sdk
         /// <param name="lang">original language</param>
         /// <param name="company">production company</param>
         /// <param name="contentRating">content rating id base on a country</param>
-        /// <param name="genre">genre</param>
+        /// <param name="genre">Genre id. This id can be found using **/genres** endpoint.</param>
         /// <param name="sort">sort by results</param>
         /// <param name="status">status</param>
         /// <param name="year">release year</param>
@@ -9574,6 +9574,10 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("thumbnail")]
         public string Thumbnail { get; set; }
 
+        /// <summary>
+        /// The artwork type corresponds to the ids from the /artwork/types endpoint.
+        /// </summary>
+
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public long Type { get; set; }
 
@@ -9645,6 +9649,10 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("thumbnailWidth")]
         public long ThumbnailWidth { get; set; }
+
+        /// <summary>
+        /// The artwork type corresponds to the ids from the /artwork/types endpoint.
+        /// </summary>
 
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public long Type { get; set; }
