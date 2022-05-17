@@ -10619,8 +10619,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("nameTranslations")]
         public System.Collections.Generic.IReadOnlyList<string> NameTranslations { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("network")]
-        public System.Collections.Generic.IReadOnlyList<Company> Network { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("networks")]
+        public System.Collections.Generic.IReadOnlyList<Company> Networks { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("nominations")]
         public System.Collections.Generic.IReadOnlyList<AwardNomineeBaseRecord> Nominations { get; set; }
@@ -10660,6 +10660,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("translations")]
+        public TranslationExtended Translations { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
         public string LastUpdated { get; set; }
@@ -11097,6 +11100,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("trailers")]
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("translations")]
+        public TranslationExtended Translations { get; set; }
+
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
         [System.Text.Json.Serialization.JsonExtensionData]
@@ -11207,6 +11213,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("tagOptions")]
         public System.Collections.Generic.IReadOnlyList<TagOption> TagOptions { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("translations")]
+        public TranslationExtended Translations { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11616,9 +11625,6 @@ namespace Tvdb.Sdk
     public partial class SeriesBaseRecord
     {
 
-        [System.Text.Json.Serialization.JsonPropertyName("abbreviation")]
-        public string Abbreviation { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("aliases")]
         public System.Collections.Generic.IReadOnlyList<Alias> Aliases { get; set; }
 
@@ -11670,9 +11676,6 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("score")]
         public double Score { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("slug")]
-        public string Slug { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
 
@@ -11706,9 +11709,6 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("airsTime")]
         public string AirsTime { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("airsTimeUTC")]
-        public string AirsTimeUTC { get; set; }
-
         [System.Text.Json.Serialization.JsonPropertyName("aliases")]
         public System.Collections.Generic.IReadOnlyList<Alias> Aliases { get; set; }
 
@@ -11729,6 +11729,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("defaultSeasonType")]
         public long DefaultSeasonType { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("episodes")]
+        public System.Collections.Generic.IReadOnlyList<EpisodeBaseRecord> Episodes { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("firstAired")]
         public string FirstAired { get; set; }
@@ -11809,7 +11812,7 @@ namespace Tvdb.Sdk
         public System.Collections.Generic.IReadOnlyList<Trailer> Trailers { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("translations")]
-        public System.Collections.Generic.IReadOnlyList<TranslationExtended> Translations { get; set; }
+        public TranslationExtended Translations { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
