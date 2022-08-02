@@ -11295,6 +11295,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("image")]
         public string Image { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
 
@@ -11786,6 +11789,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("score")]
         public double Score { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("slug")]
+        public string Slug { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
