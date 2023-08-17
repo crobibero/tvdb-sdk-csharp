@@ -24,7 +24,7 @@ namespace Tvdb.Sdk
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// create an auth token. The token has one month valition length.
+        /// create an auth token. The token has one month validation length.
         /// </summary>
         /// <returns>response</returns>
         /// <exception cref="LoginException">A server side error occurred.</exception>
@@ -60,7 +60,7 @@ namespace Tvdb.Sdk
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// create an auth token. The token has one month valition length.
+        /// create an auth token. The token has one month validation length.
         /// </summary>
         /// <returns>response</returns>
         /// <exception cref="LoginException">A server side error occurred.</exception>
@@ -4418,17 +4418,23 @@ namespace Tvdb.Sdk
         System.Threading.Tasks.Task<Response28> GetListAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="ListsException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Response29> GetListBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="ListsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response29> GetListExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response30> GetListExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="ListsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response30> GetListTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response31> GetListTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -4605,7 +4611,97 @@ namespace Tvdb.Sdk
                         if (status_ == 404)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ListsException("Lists not found", status_, responseText_, headers_, null);
+                            throw new ListsException("List not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ListsException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="ListsException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response29> GetListBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (slug == null)
+                throw new System.ArgumentNullException("slug");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("lists/slug/{slug}");
+            urlBuilder_.Replace("{slug}", System.Uri.EscapeDataString(ConvertToString(slug, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response29>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ListsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ListsException("Invalid list slug", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ListsException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ListsException("List not found", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -4631,7 +4727,7 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="ListsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response29> GetListExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response30> GetListExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4672,7 +4768,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response29>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response30>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ListsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4722,7 +4818,7 @@ namespace Tvdb.Sdk
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="ListsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response30> GetListTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response31> GetListTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -4767,7 +4863,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response30>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response31>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ListsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -4920,13 +5016,13 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response31> GetAllMovieAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response32> GetAllMovieAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response32> GetMovieBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response33> GetMovieBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -4934,7 +5030,7 @@ namespace Tvdb.Sdk
         /// <param name="short">reduce the payload and returns the short version of this record without characters, artworks and trailers.</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response33> GetMovieExtendedAsync(double id, Meta2? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response34> GetMovieExtendedAsync(double id, Meta2? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="country">country of origin</param>
@@ -4947,14 +5043,20 @@ namespace Tvdb.Sdk
         /// <param name="year">release year</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response34> GetMoviesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort? sort = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response35> GetMoviesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort? sort = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="MoviesException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Response36> GetMovieBaseBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response35> GetMovieTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response37> GetMovieTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -4988,7 +5090,7 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response31> GetAllMovieAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response32> GetAllMovieAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("movies?");
@@ -5030,84 +5132,6 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response31>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new MoviesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new MoviesException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new MoviesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <param name="id">id</param>
-        /// <returns>response</returns>
-        /// <exception cref="MoviesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response32> GetMovieBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("movies/{id}");
-            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
                             var objectResponse_ = await ReadObjectResponseAsync<Response32>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
@@ -5116,22 +5140,10 @@ namespace Tvdb.Sdk
                             return objectResponse_.Object;
                         }
                         else
-                        if (status_ == 400)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new MoviesException("Invalid movie id", status_, responseText_, headers_, null);
-                        }
-                        else
                         if (status_ == 401)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new MoviesException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 404)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new MoviesException("Movie not found", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -5155,27 +5167,16 @@ namespace Tvdb.Sdk
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
-        /// <param name="meta">meta</param>
-        /// <param name="short">reduce the payload and returns the short version of this record without characters, artworks and trailers.</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response33> GetMovieExtendedAsync(double id, Meta2? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response33> GetMovieBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("movies/{id}/extended?");
+            urlBuilder_.Append("movies/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-            if (meta != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("meta") + "=").Append(System.Uri.EscapeDataString(ConvertToString(meta, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (@short != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("short") + "=").Append(System.Uri.EscapeDataString(ConvertToString(@short, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            urlBuilder_.Length--;
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -5255,6 +5256,107 @@ namespace Tvdb.Sdk
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="id">id</param>
+        /// <param name="meta">meta</param>
+        /// <param name="short">reduce the payload and returns the short version of this record without characters, artworks and trailers.</param>
+        /// <returns>response</returns>
+        /// <exception cref="MoviesException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response34> GetMovieExtendedAsync(double id, Meta2? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("movies/{id}/extended?");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+            if (meta != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("meta") + "=").Append(System.Uri.EscapeDataString(ConvertToString(meta, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (@short != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("short") + "=").Append(System.Uri.EscapeDataString(ConvertToString(@short, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response34>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new MoviesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Invalid movie id", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Movie not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="country">country of origin</param>
         /// <param name="lang">original language</param>
         /// <param name="company">production company</param>
@@ -5265,7 +5367,7 @@ namespace Tvdb.Sdk
         /// <param name="year">release year</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response34> GetMoviesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort? sort = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response35> GetMoviesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort? sort = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (country == null)
                 throw new System.ArgumentNullException("country");
@@ -5335,7 +5437,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response34>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response35>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new MoviesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -5375,11 +5477,101 @@ namespace Tvdb.Sdk
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="MoviesException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response36> GetMovieBaseBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (slug == null)
+                throw new System.ArgumentNullException("slug");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("movies/slug/{slug}");
+            urlBuilder_.Replace("{slug}", System.Uri.EscapeDataString(ConvertToString(slug, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response36>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new MoviesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Invalid movie slug", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("Movie not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new MoviesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="MoviesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response35> GetMovieTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response37> GetMovieTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5424,7 +5616,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response35>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response37>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new MoviesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -5576,7 +5768,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Movie_StatusesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response36> GetAllMovieStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response38> GetAllMovieStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -5609,7 +5801,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Movie_StatusesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response36> GetAllMovieStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response38> GetAllMovieStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("movies/statuses");
@@ -5646,7 +5838,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response36>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response38>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new Movie_StatusesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -5787,27 +5979,27 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response37> GetAllPeopleAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response39> GetAllPeopleAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response38> GetPeopleBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response40> GetPeopleBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="meta">meta</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response39> GetPeopleExtendedAsync(double id, Meta3? meta = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response41> GetPeopleExtendedAsync(double id, Meta3? meta = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response40> GetPeopleTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response42> GetPeopleTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -5841,7 +6033,7 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response37> GetAllPeopleAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response39> GetAllPeopleAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("people?");
@@ -5883,7 +6075,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response37>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response39>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new PeopleException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -5920,7 +6112,7 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response38> GetPeopleBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response40> GetPeopleBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -5961,7 +6153,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response38>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response40>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new PeopleException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6011,7 +6203,7 @@ namespace Tvdb.Sdk
         /// <param name="meta">meta</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response39> GetPeopleExtendedAsync(double id, Meta3? meta = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response41> GetPeopleExtendedAsync(double id, Meta3? meta = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -6057,7 +6249,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response39>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response41>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new PeopleException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6107,7 +6299,7 @@ namespace Tvdb.Sdk
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="PeopleException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response40> GetPeopleTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response42> GetPeopleTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -6152,7 +6344,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response40>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response42>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new PeopleException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6304,7 +6496,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="People_TypesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response41> GetAllPeopleTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response43> GetAllPeopleTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -6337,7 +6529,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="People_TypesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response41> GetAllPeopleTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response43> GetAllPeopleTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("people/types");
@@ -6374,7 +6566,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response41>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response43>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new People_TypesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6521,13 +6713,13 @@ namespace Tvdb.Sdk
         /// <param name="limit">Limit results.</param>
         /// <returns>response</returns>
         /// <exception cref="SearchException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response42> GetSearchResultsAsync(string query = null, string q = null, string type = null, double? year = null, string company = null, string country = null, string director = null, string language = null, string primaryType = null, string network = null, string remote_id = null, double? offset = null, double? limit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response44> GetSearchResultsAsync(string query = null, string q = null, string type = null, double? year = null, string company = null, string country = null, string director = null, string language = null, string primaryType = null, string network = null, string remote_id = null, double? offset = null, double? limit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="remoteId">Search for a specific remote id.  Allows searching for an IMDB or EIDR id, for example.</param>
         /// <returns>response</returns>
         /// <exception cref="SearchException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response43> GetSearchResultsByRemoteIdAsync(string remoteId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response45> GetSearchResultsByRemoteIdAsync(string remoteId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -6573,7 +6765,7 @@ namespace Tvdb.Sdk
         /// <param name="limit">Limit results.</param>
         /// <returns>response</returns>
         /// <exception cref="SearchException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response42> GetSearchResultsAsync(string query = null, string q = null, string type = null, double? year = null, string company = null, string country = null, string director = null, string language = null, string primaryType = null, string network = null, string remote_id = null, double? offset = null, double? limit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response44> GetSearchResultsAsync(string query = null, string q = null, string type = null, double? year = null, string company = null, string country = null, string director = null, string language = null, string primaryType = null, string network = null, string remote_id = null, double? offset = null, double? limit = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("search?");
@@ -6663,7 +6855,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response42>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response44>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SearchException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6675,6 +6867,12 @@ namespace Tvdb.Sdk
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new SearchException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SearchException("Max results overflow", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -6700,7 +6898,7 @@ namespace Tvdb.Sdk
         /// <param name="remoteId">Search for a specific remote id.  Allows searching for an IMDB or EIDR id, for example.</param>
         /// <returns>response</returns>
         /// <exception cref="SearchException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response43> GetSearchResultsByRemoteIdAsync(string remoteId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response45> GetSearchResultsByRemoteIdAsync(string remoteId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (remoteId == null)
                 throw new System.ArgumentNullException("remoteId");
@@ -6741,7 +6939,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response43>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response45>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SearchException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -6882,31 +7080,31 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response44> GetAllSeasonsAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response46> GetAllSeasonsAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response45> GetSeasonBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response47> GetSeasonBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response46> GetSeasonExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response48> GetSeasonExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response47> GetSeasonTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response49> GetSeasonTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response48> GetSeasonTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response50> GetSeasonTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -6940,7 +7138,7 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response44> GetAllSeasonsAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response46> GetAllSeasonsAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("seasons?");
@@ -6982,7 +7180,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response44>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response46>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeasonsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7019,7 +7217,7 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response45> GetSeasonBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response47> GetSeasonBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7060,7 +7258,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response45>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response47>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeasonsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7109,7 +7307,7 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response46> GetSeasonExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response48> GetSeasonExtendedAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7150,7 +7348,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response46>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response48>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeasonsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7198,7 +7396,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response47> GetSeasonTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response49> GetSeasonTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("seasons/types");
@@ -7235,7 +7433,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response47>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response49>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeasonsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7273,7 +7471,7 @@ namespace Tvdb.Sdk
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="SeasonsException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response48> GetSeasonTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response50> GetSeasonTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -7318,7 +7516,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response48>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response50>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeasonsException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -7471,13 +7669,13 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response49> GetAllSeriesAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response51> GetAllSeriesAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response50> GetSeriesBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response52> GetSeriesBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -7485,13 +7683,13 @@ namespace Tvdb.Sdk
         /// <param name="type">type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response51> GetSeriesArtworksAsync(double id, string lang = null, int? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response53> GetSeriesArtworksAsync(double id, string lang = null, int? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response52> GetSeriesNextAiredAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response54> GetSeriesNextAiredAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -7499,7 +7697,7 @@ namespace Tvdb.Sdk
         /// <param name="short">reduce the payload and returns the short version of this record without characters and artworks</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response53> GetSeriesExtendedAsync(double id, Meta4? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response55> GetSeriesExtendedAsync(double id, Meta4? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
@@ -7507,14 +7705,14 @@ namespace Tvdb.Sdk
         /// <param name="airDate">airDate of the episode, format is yyyy-mm-dd</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response54> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response56> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="season_type">season-type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response55> GetSeriesSeasonEpisodesTranslatedAsync(int page, double id, string season_type, string lang, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response57> GetSeriesSeasonEpisodesTranslatedAsync(int page, double id, string season_type, string lang, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="country">country of origin</param>
@@ -7528,14 +7726,20 @@ namespace Tvdb.Sdk
         /// <param name="year">release year</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response56> GetSeriesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort2? sort = null, SortType? sortType = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response58> GetSeriesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort2? sort = null, SortType? sortType = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="SeriesException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<Response59> GetSeriesBaseBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response57> GetSeriesTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response60> GetSeriesTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -7569,192 +7773,13 @@ namespace Tvdb.Sdk
         /// <param name="page">page number</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response49> GetAllSeriesAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response51> GetAllSeriesAsync(double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("series?");
             if (page != null)
             {
                 urlBuilder_.Append(System.Uri.EscapeDataString("page") + "=").Append(System.Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            urlBuilder_.Length--;
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response49>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <param name="id">id</param>
-        /// <returns>response</returns>
-        /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response50> GetSeriesBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("series/{id}");
-            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try
-            {
-                using (var request_ = new System.Net.Http.HttpRequestMessage())
-                {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try
-                    {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null)
-                        {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response50>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 400)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Invalid sereis id", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 401)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 404)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Sereis not found", status_, responseText_, headers_, null);
-                        }
-                        else
-                        {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally
-                    {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally
-            {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <param name="id">id</param>
-        /// <param name="lang">lang</param>
-        /// <param name="type">type</param>
-        /// <returns>response</returns>
-        /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response51> GetSeriesArtworksAsync(double id, string lang = null, int? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
-        {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
-
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("series/{id}/artworks?");
-            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-            if (lang != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("lang") + "=").Append(System.Uri.EscapeDataString(ConvertToString(lang, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
-            }
-            if (type != null)
-            {
-                urlBuilder_.Append(System.Uri.EscapeDataString("type") + "=").Append(System.Uri.EscapeDataString(ConvertToString(type, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -7798,22 +7823,10 @@ namespace Tvdb.Sdk
                             return objectResponse_.Object;
                         }
                         else
-                        if (status_ == 400)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Invalid series id", status_, responseText_, headers_, null);
-                        }
-                        else
                         if (status_ == 401)
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
-                        }
-                        else
-                        if (status_ == 404)
-                        {
-                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new SeriesException("Series not found", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -7839,13 +7852,13 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response52> GetSeriesNextAiredAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response52> GetSeriesBaseAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("series/{id}/nextAired");
+            urlBuilder_.Append("series/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
             var client_ = _httpClient;
@@ -7927,25 +7940,25 @@ namespace Tvdb.Sdk
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
-        /// <param name="meta">meta</param>
-        /// <param name="short">reduce the payload and returns the short version of this record without characters and artworks</param>
+        /// <param name="lang">lang</param>
+        /// <param name="type">type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response53> GetSeriesExtendedAsync(double id, Meta4? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response53> GetSeriesArtworksAsync(double id, string lang = null, int? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("series/{id}/extended?");
+            urlBuilder_.Append("series/{id}/artworks?");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
-            if (meta != null)
+            if (lang != null)
             {
-                urlBuilder_.Append(System.Uri.EscapeDataString("meta") + "=").Append(System.Uri.EscapeDataString(ConvertToString(meta, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append(System.Uri.EscapeDataString("lang") + "=").Append(System.Uri.EscapeDataString(ConvertToString(lang, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-            if (@short != null)
+            if (type != null)
             {
-                urlBuilder_.Append(System.Uri.EscapeDataString("short") + "=").Append(System.Uri.EscapeDataString(ConvertToString(@short, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+                urlBuilder_.Append(System.Uri.EscapeDataString("type") + "=").Append(System.Uri.EscapeDataString(ConvertToString(type, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
             urlBuilder_.Length--;
 
@@ -8028,11 +8041,202 @@ namespace Tvdb.Sdk
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
+        /// <returns>response</returns>
+        /// <exception cref="SeriesException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response54> GetSeriesNextAiredAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("series/{id}/nextAired");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response54>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Invalid series id", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Series not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="id">id</param>
+        /// <param name="meta">meta</param>
+        /// <param name="short">reduce the payload and returns the short version of this record without characters and artworks</param>
+        /// <returns>response</returns>
+        /// <exception cref="SeriesException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response55> GetSeriesExtendedAsync(double id, Meta4? meta = null, bool? @short = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (id == null)
+                throw new System.ArgumentNullException("id");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("series/{id}/extended?");
+            urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+            if (meta != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("meta") + "=").Append(System.Uri.EscapeDataString(ConvertToString(meta, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (@short != null)
+            {
+                urlBuilder_.Append(System.Uri.EscapeDataString("short") + "=").Append(System.Uri.EscapeDataString(ConvertToString(@short, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            urlBuilder_.Length--;
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response55>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Invalid series id", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Series not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="id">id</param>
         /// <param name="season_type">season-type</param>
         /// <param name="airDate">airDate of the episode, format is yyyy-mm-dd</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response54> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response56> GetSeriesEpisodesAsync(int page, double id, string season_type, int? season = null, int? episodeNumber = null, string airDate = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -8094,7 +8298,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response54>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response56>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8144,7 +8348,7 @@ namespace Tvdb.Sdk
         /// <param name="season_type">season-type</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response55> GetSeriesSeasonEpisodesTranslatedAsync(int page, double id, string season_type, string lang, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response57> GetSeriesSeasonEpisodesTranslatedAsync(int page, double id, string season_type, string lang, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -8198,7 +8402,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response55>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response57>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8255,7 +8459,7 @@ namespace Tvdb.Sdk
         /// <param name="year">release year</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response56> GetSeriesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort2? sort = null, SortType? sortType = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response58> GetSeriesFilterAsync(string country, string lang, double? company = null, double? contentRating = null, double? genre = null, Sort2? sort = null, SortType? sortType = null, double? status = null, double? year = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (country == null)
                 throw new System.ArgumentNullException("country");
@@ -8329,7 +8533,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response56>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response58>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8369,11 +8573,101 @@ namespace Tvdb.Sdk
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <param name="slug">slug</param>
+        /// <returns>response</returns>
+        /// <exception cref="SeriesException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<Response59> GetSeriesBaseBySlugAsync(string slug, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        {
+            if (slug == null)
+                throw new System.ArgumentNullException("slug");
+
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append("series/slug/{slug}");
+            urlBuilder_.Replace("{slug}", System.Uri.EscapeDataString(ConvertToString(slug, System.Globalization.CultureInfo.InvariantCulture)));
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<Response59>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 400)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Invalid series slug", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("Series not found", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new SeriesException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <param name="language">language</param>
         /// <returns>response</returns>
         /// <exception cref="SeriesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response57> GetSeriesTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response60> GetSeriesTranslationAsync(double id, string language, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -8418,7 +8712,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response57>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response60>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8570,7 +8864,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Series_StatusesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response58> GetAllSeriesStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response61> GetAllSeriesStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -8603,7 +8897,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Series_StatusesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response58> GetAllSeriesStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response61> GetAllSeriesStatusesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("series/statuses");
@@ -8640,7 +8934,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response58>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response61>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new Series_StatusesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8780,7 +9074,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Source_TypesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response59> GetAllSourceTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response62> GetAllSourceTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -8813,7 +9107,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="Source_TypesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response59> GetAllSourceTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response62> GetAllSourceTypesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("sources/types");
@@ -8850,7 +9144,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response59>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response62>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new Source_TypesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -8991,7 +9285,7 @@ namespace Tvdb.Sdk
         /// <param name="page">name</param>
         /// <returns>response</returns>
         /// <exception cref="UpdatesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response60> UpdatesAsync(double since, Type? type = null, Action? action = null, double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response63> UpdatesAsync(double since, Type? type = null, Action? action = null, double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -9025,7 +9319,7 @@ namespace Tvdb.Sdk
         /// <param name="page">name</param>
         /// <returns>response</returns>
         /// <exception cref="UpdatesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response60> UpdatesAsync(double since, Type? type = null, Action? action = null, double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response63> UpdatesAsync(double since, Type? type = null, Action? action = null, double? page = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (since == null)
                 throw new System.ArgumentNullException("since");
@@ -9079,7 +9373,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response60>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response63>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new UpdatesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -9225,13 +9519,13 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="User_infoException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response61> GetUserInfoAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response64> GetUserInfoAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="User_infoException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response62> GetUserInfoByIdAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response65> GetUserInfoByIdAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
     }
 
@@ -9264,7 +9558,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="User_infoException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response61> GetUserInfoAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response64> GetUserInfoAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("user");
@@ -9301,7 +9595,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response61>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response64>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new User_infoException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -9338,7 +9632,7 @@ namespace Tvdb.Sdk
         /// <param name="id">id</param>
         /// <returns>response</returns>
         /// <exception cref="User_infoException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response62> GetUserInfoByIdAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response65> GetUserInfoByIdAsync(double id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             if (id == null)
                 throw new System.ArgumentNullException("id");
@@ -9379,7 +9673,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response62>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response65>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new User_infoException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -9519,7 +9813,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="FavoritesException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<Response63> GetUserFavoritesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
+        System.Threading.Tasks.Task<Response66> GetUserFavoritesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken));
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Ok</returns>
@@ -9557,7 +9851,7 @@ namespace Tvdb.Sdk
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>response</returns>
         /// <exception cref="FavoritesException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response63> GetUserFavoritesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
+        public virtual async System.Threading.Tasks.Task<Response66> GetUserFavoritesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken))
         {
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append("user/favorites");
@@ -9594,7 +9888,7 @@ namespace Tvdb.Sdk
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<Response63>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<Response66>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new FavoritesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -9841,11 +10135,17 @@ namespace Tvdb.Sdk
     public partial class ArtworkBaseRecord
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("height")]
+        public long Height { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("image")]
         public string Image { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("includesText")]
+        public bool IncludesText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("language")]
         public string Language { get; set; }
@@ -9862,6 +10162,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public long Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("width")]
+        public long Width { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -9892,6 +10195,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("image")]
         public string Image { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("includesText")]
+        public bool IncludesText { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("language")]
         public string Language { get; set; }
@@ -10236,6 +10542,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("aliases")]
         public System.Collections.Generic.IReadOnlyList<Alias> Aliases { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("episode")]
+        public RecordInfo Episode { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("episodeId")]
         public int EpisodeId { get; set; }
 
@@ -10250,6 +10559,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("movieId")]
         public int MovieId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("movie")]
+        public RecordInfo Movie { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
@@ -10271,6 +10583,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("seriesId")]
         public int SeriesId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("series")]
+        public RecordInfo Series { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("sort")]
         public long Sort { get; set; }
@@ -10557,8 +10872,20 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("entityType")]
         public string EntityType { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("methodInt")]
+        public int MethodInt { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("method")]
         public string Method { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("extraInfo")]
+        public string ExtraInfo { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("userId")]
+        public int UserId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("recordType")]
+        public string RecordType { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("recordId")]
         public long RecordId { get; set; }
@@ -10609,6 +10936,13 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("airsBeforeSeason")]
         public int AirsBeforeSeason { get; set; }
 
+        /// <summary>
+        /// season, midseason, or series
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
+        public string FinaleType { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
 
@@ -10620,6 +10954,12 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("isMovie")]
         public long IsMovie { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("linkedMovie")]
+        public int LinkedMovie { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
@@ -10651,15 +10991,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("seasonName")]
         public string SeasonName { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
-        public string LastUpdated { get; set; }
-
-        /// <summary>
-        /// season, midseason, or series
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
-        public string FinaleType { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -10703,6 +11036,13 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("contentRatings")]
         public System.Collections.Generic.IReadOnlyList<ContentRating> ContentRatings { get; set; }
 
+        /// <summary>
+        /// season, midseason, or series
+        /// </summary>
+
+        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
+        public string FinaleType { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public long Id { get; set; }
 
@@ -10714,6 +11054,12 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("isMovie")]
         public long IsMovie { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("linkedMovie")]
+        public int LinkedMovie { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
@@ -10766,15 +11112,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("translations")]
         public TranslationExtended Translations { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
-        public string LastUpdated { get; set; }
-
-        /// <summary>
-        /// season, midseason, or series
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("finaleType")]
-        public string FinaleType { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -10833,11 +11172,11 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("series")]
         public int Series { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("movies")]
-        public int Movies { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("movie")]
+        public int Movie { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("episodes")]
-        public int Episodes { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("episode")]
+        public int Episode { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("artwork")]
         public int Artwork { get; set; }
@@ -10974,11 +11313,17 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("overviewTranslations")]
         public System.Collections.Generic.IReadOnlyList<string> OverviewTranslations { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("url")]
-        public string Url { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("remoteIds")]
+        public System.Collections.Generic.IReadOnlyList<RemoteID> RemoteIds { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("tags")]
+        public System.Collections.Generic.IReadOnlyList<TagOption> Tags { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("score")]
         public int Score { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("url")]
+        public string Url { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11061,6 +11406,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("image")]
         public string Image { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
 
@@ -11082,8 +11430,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("runtime")]
         public int Runtime { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
-        public string LastUpdated { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11117,6 +11465,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("boxOffice")]
         public string BoxOffice { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("boxOfficeUS")]
+        public string BoxOfficeUS { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("budget")]
         public string Budget { get; set; }
@@ -11204,6 +11555,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("translations")]
         public TranslationExtended Translations { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11366,6 +11720,33 @@ namespace Tvdb.Sdk
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Race
     {
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    /// <summary>
+    /// base record info
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RecordInfo
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("image")]
+        public string Image { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11547,6 +11928,39 @@ namespace Tvdb.Sdk
     }
 
     /// <summary>
+    /// search by remote reuslt is a base record for a movie, series, people, season or company search result
+    /// </summary>
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SearchByRemoteIdResult
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("series")]
+        public SeriesBaseRecord Series { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("people")]
+        public PeopleBaseRecord People { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("movie")]
+        public MovieBaseRecord Movie { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("episode")]
+        public EpisodeBaseRecord Episode { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("company")]
+        public Company Company { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    /// <summary>
     /// season genre record
     /// </summary>
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -11585,6 +11999,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("type")]
         public SeasonType Type { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11651,6 +12068,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("translations")]
         public System.Collections.Generic.IReadOnlyList<Translation> Translations { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11769,6 +12189,9 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("lastAired")]
         public string LastAired { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
+        public string LastUpdated { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
 
@@ -11796,8 +12219,8 @@ namespace Tvdb.Sdk
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public Status Status { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("lastUpdated")]
-        public string LastUpdated { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -11930,6 +12353,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("translations")]
         public TranslationExtended Translations { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("year")]
+        public string Year { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -12119,6 +12545,9 @@ namespace Tvdb.Sdk
 
         [System.Text.Json.Serialization.JsonPropertyName("url")]
         public string Url { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("runtime")]
+        public int Runtime { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -13263,7 +13692,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public ListExtendedRecord Data { get; set; }
+        public ListBaseRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13284,7 +13713,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<Translation> Data { get; set; }
+        public ListExtendedRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13302,6 +13731,27 @@ namespace Tvdb.Sdk
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Response31
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("data")]
+        public System.Collections.Generic.IReadOnlyList<Translation> Data { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Response32
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13325,7 +13775,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response32
+    public partial class Response33
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13346,7 +13796,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response33
+    public partial class Response34
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13367,7 +13817,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response34
+    public partial class Response35
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13388,7 +13838,28 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response35
+    public partial class Response36
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("data")]
+        public MovieBaseRecord Data { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Response37
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13409,7 +13880,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response36
+    public partial class Response38
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13430,7 +13901,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response37
+    public partial class Response39
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13454,7 +13925,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response38
+    public partial class Response40
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13475,7 +13946,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response39
+    public partial class Response41
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13496,53 +13967,11 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response40
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Translation Data { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        public string Status { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties; }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response41
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<PeopleType> Data { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        public string Status { get; set; }
-
-        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
-
-        [System.Text.Json.Serialization.JsonExtensionData]
-        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties; }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class Response42
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SearchResult> Data { get; set; }
+        public Translation Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13563,7 +13992,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SearchResult> Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<PeopleType> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13584,10 +14013,13 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SeasonBaseRecord> Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SearchResult> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("links")]
+        public Links Links { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -13605,7 +14037,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public SeasonBaseRecord Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SearchByRemoteIdResult> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13626,7 +14058,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public SeasonExtendedRecord Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SeasonBaseRecord> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13647,7 +14079,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SeasonType> Data { get; set; }
+        public SeasonBaseRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13668,7 +14100,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Translation Data { get; set; }
+        public SeasonExtendedRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13689,13 +14121,10 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SeriesBaseRecord> Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SeasonType> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("links")]
-        public Links Links { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -13713,7 +14142,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public SeriesBaseRecord Data { get; set; }
+        public Translation Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13734,10 +14163,13 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public SeriesExtendedRecord Data { get; set; }
+        public System.Collections.Generic.IReadOnlyList<SeriesBaseRecord> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("links")]
+        public Links Links { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -13797,7 +14229,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Data2 Data { get; set; }
+        public SeriesBaseRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13818,7 +14250,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Data3 Data { get; set; }
+        public SeriesExtendedRecord Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13839,7 +14271,10 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public System.Collections.Generic.IReadOnlyList<SeriesBaseRecord> Data { get; set; }
+        public Data2 Data { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; }
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
 
@@ -13857,7 +14292,7 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public Translation Data { get; set; }
+        public Data3 Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
         public string Status { get; set; }
@@ -13878,6 +14313,66 @@ namespace Tvdb.Sdk
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
+        public System.Collections.Generic.IReadOnlyList<SeriesBaseRecord> Data { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Response59
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("data")]
+        public SeriesBaseRecord Data { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Response60
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("data")]
+        public Translation Data { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("status")]
+        public string Status { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties = new System.Collections.Generic.Dictionary<string, object>();
+
+        [System.Text.Json.Serialization.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties; }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class Response61
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("data")]
         public System.Collections.Generic.IReadOnlyList<Status> Data { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("status")]
@@ -13895,7 +14390,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response59
+    public partial class Response62
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13916,7 +14411,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response60
+    public partial class Response63
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13940,7 +14435,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response61
+    public partial class Response64
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13961,7 +14456,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response62
+    public partial class Response65
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
@@ -13982,7 +14477,7 @@ namespace Tvdb.Sdk
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.5.0 (NJsonSchema v10.6.6.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Response63
+    public partial class Response66
     {
 
         [System.Text.Json.Serialization.JsonPropertyName("data")]
