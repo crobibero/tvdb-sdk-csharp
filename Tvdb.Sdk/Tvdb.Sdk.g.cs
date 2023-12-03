@@ -12163,7 +12163,7 @@ namespace Tvdb.Sdk
         public System.Collections.Generic.IReadOnlyList<Alias> Aliases { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("averageRuntime")]
-        public int AverageRuntime { get; set; }
+        public int? AverageRuntime { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("country")]
         public string Country { get; set; }
@@ -12256,7 +12256,7 @@ namespace Tvdb.Sdk
         public System.Collections.Generic.IReadOnlyList<ArtworkExtendedRecord> Artworks { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("averageRuntime")]
-        public int AverageRuntime { get; set; }
+        public int? AverageRuntime { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("characters")]
         public System.Collections.Generic.IReadOnlyList<Character> Characters { get; set; }
