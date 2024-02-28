@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: "30 0 * * *"
   workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: Version override
 
 jobs:
   build:
@@ -21,8 +25,8 @@ jobs:
       - uses: actions/setup-dotnet@v4.0.0
         with:
           dotnet-version: |
+            8.0.x
             6.0.x
-            5.0.x
             3.1.x
       - uses: chrisdickinson/setup-yq@latest
         with:
@@ -38,14 +42,20 @@ jobs:
           echo "::set-output name=number::$(yq eval .info.version ../swagger.yml)"
 
       - name: Create new version string
+        if: "${{ github.event.inputs.version == '' }}"
         id: version
         run: echo "::set-output name=number::$(echo ${{ steps.apiversion.outputs.number }})"
+
+      - name: Create new version string
+        if: "${{ github.event.inputs.version != '' }}"
+        id: version
+        run: echo "::set-output name=number::$(echo ${{ github.event.inputs.version }})"
 
       - name: Install dotnet-setversion
         run: dotnet tool install -g dotnet-setversion
 
       - name: Set project version
-        run: setversion ${{steps.version.outputs.number}}
+        run: setversion ${{ steps.version.outputs.number }}
 
       - name: Generate
         run: dotnet msbuild -target:Generate

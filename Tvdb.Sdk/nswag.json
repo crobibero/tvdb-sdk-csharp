@@ -1,5 +1,5 @@
 {
-  "runtime": "Net60",
+  "runtime": "Net80",
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
@@ -89,7 +89,7 @@
       "inlineNamedTuples": true,
       "inlineNamedAny": false,
       "generateDtoTypes": true,
-      "generateOptionalPropertiesAsNullable": false,
+      "generateOptionalPropertiesAsNullable": true,
       "generateNullableReferenceTypes": false,
       "templateDirectory": null,
       "typeNameGeneratorType": null,
