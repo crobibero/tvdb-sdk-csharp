@@ -46,16 +46,16 @@ jobs:
         id: version
         run: echo "::set-output name=number::$(echo ${{ steps.apiversion.outputs.number }})"
 
-      - name: Create new version string
-        if: "${{ github.event.inputs.version != '' }}"
-        id: version
-        run: echo "::set-output name=number::$(echo ${{ github.event.inputs.version }})"
-
       - name: Install dotnet-setversion
         run: dotnet tool install -g dotnet-setversion
 
-      - name: Set project version
+      - name: Set project version to specification value
+        if: "${{ github.event.inputs.version == '' }}"
         run: setversion ${{ steps.version.outputs.number }}
+
+      - name: Set project version to override value
+        if: "${{ github.event.inputs.version != '' }}"
+        run: setversion ${{ github.event.inputs.version }}
 
       - name: Generate
         run: dotnet msbuild -target:Generate
