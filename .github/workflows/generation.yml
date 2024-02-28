@@ -39,12 +39,12 @@ jobs:
         id: apiversion
         run: |
           curl https://thetvdb.github.io/v4-api/swagger.yml -o ../swagger.yml
-          echo "::set-output name=number::$(yq eval .info.version ../swagger.yml)"
+          echo "number=$(yq eval .info.version ../swagger.yml)" >> $GITHUB_OUTPUT
 
       - name: Create new version string
         if: "${{ github.event.inputs.version == '' }}"
         id: version
-        run: echo "::set-output name=number::$(echo ${{ steps.apiversion.outputs.number }})"
+        run: echo "number=$(echo ${{ steps.apiversion.outputs.number }})" >> $GITHUB_OUTPUT
 
       - name: Install dotnet-setversion
         run: dotnet tool install -g dotnet-setversion
@@ -62,7 +62,7 @@ jobs:
 
       - name: Check if generated client files were modified
         id: diff
-        run: echo "::set-output name=count::$(git status -s | grep cs | grep -v csproj | wc -l)"
+        run: echo "count=$(git status -s | grep cs | grep -v csproj | wc -l)" >> $GITHUB_OUTPUT
 
       - name: Build packages
         if: ${{ steps.diff.outputs.count > 0 }}
