@@ -11864,6 +11864,9 @@ namespace Tvdb.Sdk
     public partial class EpisodeBaseRecord
     {
 
+        [System.Text.Json.Serialization.JsonPropertyName("absoluteNumber")]
+        public int? AbsoluteNumber { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("aired")]
         public string Aired { get; set; }
 
