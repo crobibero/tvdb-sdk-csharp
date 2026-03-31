@@ -9089,6 +9089,27 @@ namespace Tvdb.Sdk
                             {
                                 throw new SeriesException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
+                            // workaround for inoperative season types
+                            if(objectResponse_.Object.Data.Episodes.Count == 0)
+                            {
+                                // Get all season records for the series
+                                var seriesExt = await GetSeriesExtendedAsync(id, null, true, cancellationToken);
+                                // Filter the seasons by the desired season type
+                                var seasonsByType = seriesExt.Data.Seasons.Where(s => s.Type = season_type);
+                                // Set up a List to collect all the episodes for the season type
+                                var missingEpisodes = new List<EpisodeBaseRecord>();
+                                // Set up a seasons client (I don't know if this is the correct way to do it)
+                                var seasonsClient = serviceProvider.GetRequiredService<ISeasonsClient>();
+                                foreach (var season in seasonsByType)
+                                {
+                                    // Get the episodes from the extended season record
+                                    var thisSeasonExt = await seasonsClient.GetSeasonExtendedAsync(season.id, cancellationToken);
+                                    missingEpisodes.AddRange(thisSeasonExt.Data.Episodes);
+                                }
+                                // Replace the empty episode list with all the collected episodes. If it's empty, we're no worse off than before.
+                                objectResponse_.Object.Data.Episodes = missingEpisodes;
+                            }
+
                             return objectResponse_.Object;
                         }
                         else
